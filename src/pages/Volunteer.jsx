@@ -239,7 +239,7 @@ function Dashboard({ vol, onSignOut }) {
       setFires(all);
       const mine = all.filter((f) => haversineKm(vol, f) <= vol.radius_km);
       const seen = new Set(load(SEEN_FIRES, []));
-      const fresh = mine.filter((f) => !seen.has(`${f.lat},${f.lng},${f.acquired}`));
+      const fresh = mine.filter((f) => !seen.has((f.cell || `${f.lat},${f.lng}`)));
       if (fresh.length) {
         alertUser(
           'fire',
@@ -247,7 +247,7 @@ function Dashboard({ vol, onSignOut }) {
         );
         localStorage.setItem(
           SEEN_FIRES,
-          JSON.stringify(mine.map((f) => `${f.lat},${f.lng},${f.acquired}`))
+          JSON.stringify(mine.map((f) => (f.cell || `${f.lat},${f.lng}`)))
         );
       } else if (force && !quiet) {
         setBanner({ kind: 'info', text: 'No new fires in your area.' });

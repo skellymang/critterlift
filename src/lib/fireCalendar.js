@@ -159,16 +159,42 @@ export function monthlyAverages(rows) {
 }
 
 // Burning cells between two dates (inclusive), as points for the map.
-// seenBy: 'both' | 'viirs' | 'modis'
+// Each grid cell appears once, however many days it burned and whichever
+// satellites saw it, so one fire is never drawn or counted twice.
+// seenBy: 'both' | 'viirs' | 'modis'; date = the last day it burned; days = how many days.
 export function cellsBetween(calendar, from, to) {
-  const out = [];
+  const cells = new Map();
   for (const [date, day] of Object.entries(calendar.days)) {
     if (date < from || date > to) continue;
     const c = day.cells;
     for (let n = 0; n < c.length; n += 3) {
-      const { lat, lng } = cellCenter(c[n], c[n + 1]);
-      out.push({ lat, lng, date, seenBy: c[n + 2] === 3 ? 'both' : c[n + 2] === 2 ? 'viirs' : 'modis' });
+      const key = `${c[n]},${c[n + 1]}`;
+      const cell = cells.get(key);
+      if (!cell) cells.set(key, { i: c[n], j: c[n + 1], flag: c[n + 2], date, days: 1 });
+      else {
+        cell.flag |= c[n + 2];
+        cell.days++;
+        if (date > cell.date) cell.date = date;
+      }
     }
   }
-  return out;
+  return [...cells.values()].map(({ i, j, flag, date, days }) => ({
+    ...cellCenter(i, j), date, days, seenBy: flag === 3 ? 'both' : flag === 2 ? 'viirs' : 'modis',
+  }));
+}
+
+// Live detections: the same fire is often reported several times (overlapping
+// satellite passes, neighbouring pixels). Keep one per grid cell: the most
+// confident, then the most recent.
+export function onePerCell(fires) {
+  const rank = (f) => ({ h: 2, n: 1 })[String(f.confidence ?? 'n').trim().toLowerCase()[0]] ?? 0;
+  const best = new Map();
+  for (const f of fires) {
+    const cell = cellOf(f.lat, f.lng).join(',');
+    const had = best.get(cell);
+    if (!had || rank(f) > rank(had) || (rank(f) === rank(had) && String(f.acquired) > String(had.acquired))) {
+      best.set(cell, { ...f, cell });
+    }
+  }
+  return [...best.values()];
 }

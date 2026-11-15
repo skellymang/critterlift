@@ -1,3 +1,4 @@
+import { onePerCell } from './fireCalendar.js';
 import { createClient } from '@supabase/supabase-js';
 
 const url = import.meta.env.VITE_SUPABASE_URL;
@@ -49,6 +50,7 @@ export async function loadFires(date, { force = false } = {}) {
   const r = await fetch(`/api/fires${date ? `?date=${date}` : ''}`);
   const body = await r.json();
   if (!r.ok) throw new Error(body.error || 'Could not load fire data');
-  fireCache.set(key, body.fires);
-  return body.fires;
+  const fires = onePerCell(body.fires || []); // never count one fire twice
+  fireCache.set(key, fires);
+  return fires;
 }

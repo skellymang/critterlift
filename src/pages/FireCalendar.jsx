@@ -88,11 +88,6 @@ export default function FireCalendar() {
     <section className="viz">
       <div className="card">
         <h2>Burning activity calendar</h2>
-        <p>
-          Two NASA satellites record fires differently, so their counts can't be compared directly.
-          This calendar puts MODIS and VIIRS on one scale to show when burning has happened here,
-          which days were unusual, and which months need volunteers on call.
-        </p>
         <label className="field">
           Area
           <select value={areaId} onChange={(e) => { setAreaId(e.target.value); setPicked(null); }}>

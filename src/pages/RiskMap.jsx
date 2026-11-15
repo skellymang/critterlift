@@ -92,7 +92,7 @@ export default function RiskMap() {
     const fromHistory = async (days, lead = '') => {
       const cal = await loadCalendar();
       const pts = historyPoints(cal, daysAgo(days), daysAgo(0));
-      show(pts, 'history', `${lead}${plural(pts.length, 'burning spot')} in the past ${days === 365 ? '12 months' : `${days} days`}, from NASA's MODIS and VIIRS records.`);
+      show(pts, 'history', `${lead}${plural(pts.length, 'burning spot')} in the past ${days === 365 ? '12 months' : `${days} days`}, from NASA's MODIS and VIIRS records. A spot seen by both satellites, or on several days, is counted once.`);
     };
 
     setStatus('Loading NASA fire data…');
@@ -110,7 +110,7 @@ export default function RiskMap() {
         } catch (e) {
           problem = e.message;
         }
-        if (found.length) return show(found, 'live', `${plural(found.length, 'fire detection')} ${when}, live from NASA.`);
+        if (found.length) return show(found, 'live', `${plural(found.length, 'burning spot')} ${when}, live from NASA. Repeat sightings of the same spot are counted once.`);
 
         // Nothing live: fall back to the saved record so the map is never empty.
         try {
