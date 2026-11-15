@@ -1,0 +1,15 @@
+-- Rehab contacts must come from real data, never from memory or a model.
+-- Copy 10 to 15 rows from the Texas Parks and Wildlife rehabilitator list
+-- (Travis, Williamson, Hays counties), then run this file.
+--
+-- species_ok values must be from this set (same as the app):
+--   bird, small_mammal, rabies_vector, deer, reptile, amphibian, other
+-- rabies_vector = bats, raccoons, skunks, foxes, coyotes.
+--
+-- Get lat/lng by right-clicking the address in a map and copying coordinates.
+
+-- Uncomment the insert once you have real rows:
+-- insert into rehabs (name, lat, lng, species_ok, phone, hours, source) values
+  -- ('Name from TPWD list', 30.0000, -97.0000, '{bird,small_mammal}', '512-000-0000', 'Daily 9am-5pm', 'tpwd'),
+  -- ('Second rehab',        30.0000, -97.0000, '{reptile,amphibian}',  '512-000-0000', 'Call first',    'tpwd')
+-- ;
